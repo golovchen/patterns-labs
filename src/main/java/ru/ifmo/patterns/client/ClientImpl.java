@@ -13,6 +13,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Dmitry Golovchenko
@@ -48,7 +49,7 @@ public class ClientImpl extends UnicastRemoteObject implements Client {
 
 	private double calcLine(String expr) throws RemoteException, InterruptedException {
 		List<Node> nodes = Node.parseExpression(expr);
-		idToNode = new HashMap<>();
+		idToNode = new ConcurrentHashMap<>();
 		for (Node node : nodes) {
 			idToNode.put(node.id, node);
 		}
@@ -70,8 +71,10 @@ public class ClientImpl extends UnicastRemoteObject implements Client {
 		}
 	}
 
-	public void printResults() {
-
+	public void printResults() throws RemoteException, InterruptedException {
+		for (Double result : calcResults()) {
+			System.out.println(result);
+		}
 	}
 
 	@Override
@@ -89,4 +92,11 @@ public class ClientImpl extends UnicastRemoteObject implements Client {
 		return client.calcResults();
 	}
 
+	public static void runClient(File input, String exportRmiPath, String queueRmiPath)
+			throws IOException, NotBoundException, InterruptedException {
+		MessageQueue<BinaryOperation> queue = (MessageQueue<BinaryOperation>)Naming.lookup(queueRmiPath);
+		ClientImpl client = new ClientImpl(input, queue);
+		Naming.rebind(exportRmiPath, client);
+		client.printResults();
+	}
 }

@@ -1,15 +1,17 @@
 package ru.ifmo.patterns;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import ru.ifmo.patterns.client.*;
 import ru.ifmo.patterns.server.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,9 +26,30 @@ public class MainTest {
 	public static final String DIV_QUEUE = RMI_HOST + "divQueue";
 	public static final String MAIN_QUEUE = RMI_HOST + "mainQueue";
 	public static final String CLIENT = RMI_HOST + "client";
+	
+	@Test
+	public void printResult() throws NotBoundException, InterruptedException, IOException {
+		File input = new File("src/test/resources/input.txt");
+		printFileResults(input);
+	}
 
 	@Test
-	public void test1() throws RemoteException, MalformedURLException, NotBoundException, InterruptedException {
+	public void printResult2() throws NotBoundException, InterruptedException, IOException {
+		File input = new File("src/test/resources/input2.txt");
+		printFileResults(input);
+	}
+
+	private void printFileResults(File input) throws NotBoundException, IOException, InterruptedException {
+		List<WorkerPool> pools = runServers();
+
+		ClientImpl.runClient(input, CLIENT, MAIN_QUEUE);
+
+		for (WorkerPool pool : pools) {
+			pool.terminate();
+		}
+	}
+
+	private List<WorkerPool> runServers() throws RemoteException, MalformedURLException, NotBoundException {
 		LocateRegistry.createRegistry(1099);
 		MessageQueueImpl<AddOperation> addQueue = new MessageQueueImpl<>();
 		MessageQueueImpl<SubOperation> subQueue = new MessageQueueImpl<>();
@@ -41,7 +64,7 @@ public class MainTest {
 		mainQueue.share(MAIN_QUEUE);
 
 		final RoutingWorkerFactory routingFactory = new RoutingWorkerFactory(
-				(MessageQueue<AddOperation>)Naming.lookup(ADD_QUEUE),
+				(MessageQueue<AddOperation>) Naming.lookup(ADD_QUEUE),
 				(MessageQueue<SubOperation>)Naming.lookup(SUB_QUEUE),
 				(MessageQueue<MulOperation>)Naming.lookup(MUL_QUEUE),
 				(MessageQueue<DivOperation>)Naming.lookup(DIV_QUEUE)
@@ -63,6 +86,13 @@ public class MainTest {
 		for (WorkerPool pool : pools) {
 			pool.start();
 		}
+		return pools;
+	}
+
+	@Test
+	@Ignore
+	public void calcResult() throws RemoteException, MalformedURLException, NotBoundException, InterruptedException {
+		List<WorkerPool> pools = runServers();
 
 		List<String> input = Arrays.asList("1 2 +", "5 1 + 2 / 3 * 4 -");
 		List<Double> result = ClientImpl.runClient(input, CLIENT, MAIN_QUEUE);
