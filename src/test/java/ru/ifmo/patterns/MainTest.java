@@ -8,6 +8,8 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,7 +26,8 @@ public class MainTest {
 	public static final String CLIENT = RMI_HOST + "client";
 
 	@Test
-	public void test1() throws RemoteException, MalformedURLException, NotBoundException {
+	public void test1() throws RemoteException, MalformedURLException, NotBoundException, InterruptedException {
+		LocateRegistry.createRegistry(1099);
 		MessageQueueImpl<AddOperation> addQueue = new MessageQueueImpl<>();
 		MessageQueueImpl<SubOperation> subQueue = new MessageQueueImpl<>();
 		MessageQueueImpl<MulOperation> mulQueue = new MessageQueueImpl<>();
@@ -57,7 +60,11 @@ public class MainTest {
 			add(createWorkerPool(DIV_QUEUE, divWorkerFactory, 10));
 		}};
 
-		List<String> input = Arrays.asList("1 2 +", "5 1 + 2 / * 3 - 4");
+		for (WorkerPool pool : pools) {
+			pool.start();
+		}
+
+		List<String> input = Arrays.asList("1 2 +", "5 1 + 2 / 3 * 4 -");
 		List<Double> result = ClientImpl.runClient(input, CLIENT, MAIN_QUEUE);
 		List<Double> expectedResult = Arrays.asList(3., 5.);
 

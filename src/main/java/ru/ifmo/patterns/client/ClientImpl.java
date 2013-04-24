@@ -1,13 +1,14 @@
 package ru.ifmo.patterns.client;
 
-import com.google.common.base.Splitter;
-import com.google.common.primitives.Longs;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import ru.ifmo.patterns.server.MessageQueue;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
@@ -52,23 +53,21 @@ public class ClientImpl extends UnicastRemoteObject implements Client {
 			idToNode.put(node.id, node);
 		}
 		for (Node node : nodes) {
-			if (node.isReadyToCalculate()) {
+			if (node.canBeCalculated()) {
 				queue.put(node.toBinaryOperation(this));
 			}
 		}
 
-		do {
+		while (true) {
 			Node node = acceptedNodes.take();
 			if (node.parent == null) {
 				return node.value;
 			} else {
-				if (node.parent.isReadyToCalculate()) {
+				if (node.parent.canBeCalculated()) {
 					queue.put(node.parent.toBinaryOperation(this));
 				}
 			}
-		} while (!acceptedNodes.isEmpty());
-
-		throw new RuntimeException();
+		}
 	}
 
 	public void printResults() {
@@ -82,105 +81,12 @@ public class ClientImpl extends UnicastRemoteObject implements Client {
 		acceptedNodes.add(node);
 	}
 
-	public static List<Double> runClient(Iterable<String> input, String exportRmiPath, String queueRmiPath) {
-		return null;
+	public static List<Double> runClient(Iterable<String> input, String exportRmiPath, String queueRmiPath)
+			throws RemoteException, NotBoundException, MalformedURLException, InterruptedException {
+		MessageQueue<BinaryOperation> queue = (MessageQueue<BinaryOperation>)Naming.lookup(queueRmiPath);
+		ClientImpl client = new ClientImpl(input.iterator(), queue);
+		Naming.rebind(exportRmiPath, client);
+		return client.calcResults();
 	}
 
-	private static class Node {
-		private static long idCounter = 0;
-
-		public final long id;
-		public final Class<? extends BinaryOperation> operationType;
-		public Double value;
-		public Node parent;
-		private final Node left, right;
-
-		public Node(double value) {
-			this.value = value;
-			this.operationType = null;
-			this.left = null;
-			this.right = null;
-			id = idCounter++;
-		}
-
-		public Node(Class<? extends BinaryOperation> operationType, Node left, Node right) {
-			this.value = null;
-			this.operationType = null;
-			this.left = null;
-			this.right = null;
-			id = idCounter++;
-		}
-
-		public boolean isReadyToCalculate() {
-			return left.value != null && right.value != null;
-		}
-
-		public BinaryOperation toBinaryOperation(Client receiver) {
-			if (operationType == AddOperation.class) {
-				return new AddOperation(left.value, right.value, id, receiver);
-			}
-			if (operationType == SubOperation.class) {
-				return new SubOperation(left.value, right.value, id, receiver);
-			}
-			if (operationType == MulOperation.class) {
-				return new MulOperation(left.value, right.value, id, receiver);
-			}
-			if (operationType == DivOperation.class) {
-				return new DivOperation(left.value, right.value, id, receiver);
-			}
-			throw new RuntimeException();
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
-
-			return id == ((Node)o).id;
-		}
-
-		@Override
-		public int hashCode() {
-			return Longs.hashCode(id);
-		}
-
-		public static List<Node> parseExpression(String expression) throws NumberFormatException {
-			Stack<Node> stack = new Stack<>();
-			for (String lexeme : Splitter.on(' ').trimResults().omitEmptyStrings().split(expression)) {
-				Class<? extends BinaryOperation> operationType = parseOperationType(lexeme);
-				if (operationType == null) {
-					Node right = stack.pop();
-					Node left = stack.pop();
-					stack.push(new Node(null, left, right));
-					right.parent = stack.peek();
-					left.parent = stack.peek();
-				} else {
-					stack.push(new Node(Double.parseDouble(lexeme)));
-				}
-			}
-
-			List<Node> result = new ArrayList<>();
-			while (!stack.isEmpty()) {
-				Node node = stack.pop();
-				result.add(node);
-				if (node.left != null) {
-					stack.push(node.left);
-				}
-				if (node.right != null) {
-					stack.push(node.right);
-				}
-			}
-			return result;
-		}
-
-		private static Class<? extends BinaryOperation> parseOperationType(String str) {
-			switch (str) {
-				case "+": return AddOperation.class;
-				case "-": return SubOperation.class;
-				case "*": return MulOperation.class;
-				case "/": return DivOperation.class;
-				default:  return null;
-			}
-		}
-	}
 }
