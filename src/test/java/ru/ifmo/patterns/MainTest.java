@@ -25,16 +25,16 @@ public class MainTest {
 
 	@Test
 	public void test1() throws RemoteException, MalformedURLException, NotBoundException {
-		MessageQueueIml<AddOperation> addQueue = new MessageQueueIml<>();
-		MessageQueueIml<SubOperation> subQueue = new MessageQueueIml<>();
-		MessageQueueIml<MulOperation> mulQueue = new MessageQueueIml<>();
-		MessageQueueIml<DivOperation> divQueue = new MessageQueueIml<>();
+		MessageQueueImpl<AddOperation> addQueue = new MessageQueueImpl<>();
+		MessageQueueImpl<SubOperation> subQueue = new MessageQueueImpl<>();
+		MessageQueueImpl<MulOperation> mulQueue = new MessageQueueImpl<>();
+		MessageQueueImpl<DivOperation> divQueue = new MessageQueueImpl<>();
 		addQueue.share(ADD_QUEUE);
 		subQueue.share(SUB_QUEUE);
 		mulQueue.share(MUL_QUEUE);
 		divQueue.share(DIV_QUEUE);
 
-		MessageQueueIml<BinaryOperation> mainQueue = new MessageQueueIml<>();
+		MessageQueueImpl<BinaryOperation> mainQueue = new MessageQueueImpl<>();
 		mainQueue.share(MAIN_QUEUE);
 
 		final RoutingWorkerFactory routingFactory = new RoutingWorkerFactory(

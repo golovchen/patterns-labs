@@ -1,5 +1,7 @@
 package ru.ifmo.patterns.server;
 
+import java.net.MalformedURLException;
+import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -7,15 +9,15 @@ import java.util.concurrent.ArrayBlockingQueue;
 /**
  * @author Dmitry Golovchenko
  */
-public class MessageQueueIml<T> extends UnicastRemoteObject implements MessageQueue<T> {
+public class MessageQueueImpl<T> extends UnicastRemoteObject implements MessageQueue<T> {
     public final ArrayBlockingQueue<T> queue;
     public static final int CAPACITY = 100;
 
-	public MessageQueueIml() throws RemoteException {
+	public MessageQueueImpl() throws RemoteException {
         this(CAPACITY);
 	}
 
-    public MessageQueueIml(int capacity) throws RemoteException {
+    public MessageQueueImpl(int capacity) throws RemoteException {
         queue = new ArrayBlockingQueue<T>(capacity);
     }
 
@@ -29,7 +31,7 @@ public class MessageQueueIml<T> extends UnicastRemoteObject implements MessageQu
         queue.put(value);
 	}
 
-	public void share(String path) {
-
+	public void share(String path) throws MalformedURLException, RemoteException {
+		Naming.rebind(path, this);
 	}
 }
