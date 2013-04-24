@@ -7,5 +7,5 @@ import java.rmi.RemoteException;
  * @author Dmitry Golovchenko
  */
 public interface Client extends Remote {
-	void submitResult(long expressionId, long nodeId, double result) throws RemoteException;
+	void submitResult(long nodeId, double result) throws RemoteException;
 }
