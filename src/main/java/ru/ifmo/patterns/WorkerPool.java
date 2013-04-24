@@ -5,11 +5,11 @@ import java.util.List;
 /**
  * @author Dmitry Golovchenko
  */
-public class WorkerPool<T> {
-	private final MessageQueue<T> queue;
+public class WorkerPool {
+	private final MessageQueue<?> queue;
 	private final List<Thread> threads;
 
-	public WorkerPool(MessageQueue<T> queue, WorkerFactory factory, int workersCount) {
+	public <T> WorkerPool(MessageQueue<T> queue, WorkerFactory<T> factory, int workersCount) {
 		this.queue = queue;
 		this.threads = null;
 	}

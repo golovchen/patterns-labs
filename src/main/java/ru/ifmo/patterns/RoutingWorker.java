@@ -5,7 +5,7 @@ package ru.ifmo.patterns;
  */
 public class RoutingWorker extends Worker<BinaryOperation> {
 	private final MessageQueue<AddOperation>      addQueue;
-	private final MessageQueue<SubtractOperation> subQueue;
+	private final MessageQueue<SubOperation> subQueue;
 	private final MessageQueue<MulOperation>      mulQueue;
 	private final MessageQueue<DivOperation>      divQueue;
 
@@ -13,7 +13,7 @@ public class RoutingWorker extends Worker<BinaryOperation> {
 			MessageQueue<BinaryOperation> messageQueue,
 			WorkerPool workerPool,
 			MessageQueue<AddOperation> addQueue,
-			MessageQueue<SubtractOperation> subQueue,
+			MessageQueue<SubOperation> subQueue,
 			MessageQueue<MulOperation> mulQueue,
 			MessageQueue<DivOperation> divQueue
 	) {

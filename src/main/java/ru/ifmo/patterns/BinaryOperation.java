@@ -1,5 +1,7 @@
 package ru.ifmo.patterns;
 
+import java.rmi.RemoteException;
+
 /**
  * @author Dmitry Golovchenko
  */
@@ -20,6 +22,10 @@ public abstract class BinaryOperation implements Runnable {
 
 	@Override
 	public void run() {
-		receiver.submitResult(expressionId, nodeId, compute());
+		try {
+			receiver.submitResult(expressionId, nodeId, compute());
+		} catch (RemoteException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
 	}
 }
