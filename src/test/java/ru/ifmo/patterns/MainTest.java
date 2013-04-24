@@ -63,6 +63,10 @@ public class MainTest {
 		for (int i = 0; i < result.size(); i++) {
 			assertEquals(expectedResult.get(i), result.get(i), 0.0001);
 		}
+
+		for (WorkerPool pool : pools) {
+			pool.terminate();
+		}
 	}
 
 	private static <T> WorkerPool createWorkerPool(String queuePath, WorkerFactory<T> factory, int threadCount)
