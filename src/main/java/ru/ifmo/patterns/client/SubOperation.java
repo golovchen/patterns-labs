@@ -1,4 +1,4 @@
-package ru.ifmo.patterns;
+package ru.ifmo.patterns.client;
 
 /**
  * @author Dmitry Golovchenko

@@ -1,7 +1,8 @@
 package ru.ifmo.patterns;
 
-import org.junit.Assert;
 import org.junit.Test;
+import ru.ifmo.patterns.client.*;
+import ru.ifmo.patterns.server.*;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;

@@ -1,4 +1,6 @@
-package ru.ifmo.patterns;
+package ru.ifmo.patterns.server;
+
+import ru.ifmo.patterns.client.*;
 
 /**
  * @author Dmitry Golovchenko

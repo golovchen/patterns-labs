@@ -1,4 +1,6 @@
-package ru.ifmo.patterns;
+package ru.ifmo.patterns.client;
+
+import ru.ifmo.patterns.server.MessageQueue;
 
 import java.io.File;
 import java.rmi.RemoteException;
