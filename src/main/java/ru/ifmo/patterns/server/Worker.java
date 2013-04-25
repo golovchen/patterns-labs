@@ -33,5 +33,5 @@ public abstract class Worker<T> implements Runnable {
 		}
 	}
 
-	protected abstract void handle(T message);
+	protected abstract void handle(T message) throws InterruptedException;
 }

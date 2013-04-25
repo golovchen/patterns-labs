@@ -25,6 +25,6 @@ public class RoutingWorkerFactory implements WorkerFactory<BinaryOperation> {
 
 	@Override
 	public Worker<BinaryOperation> createWorker(MessageQueue<BinaryOperation> taskQueue, WorkerPool owner) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return new RoutingWorker(taskQueue, owner, addQueue, subQueue, mulQueue, divQueue);
 	}
 }

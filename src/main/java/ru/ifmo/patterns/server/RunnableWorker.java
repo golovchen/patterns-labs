@@ -10,6 +10,6 @@ public class RunnableWorker<T extends Runnable> extends Worker<T> {
 
 	@Override
 	protected void handle(T message) {
-		//To change body of implemented methods use File | Settings | File Templates.
+        message.run();
 	}
 }
