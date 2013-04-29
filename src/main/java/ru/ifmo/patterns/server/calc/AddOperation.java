@@ -1,4 +1,6 @@
-package ru.ifmo.patterns.client;
+package ru.ifmo.patterns.server.calc;
+
+import ru.ifmo.patterns.server.routing.RoutingWorker;
 
 import java.io.Serializable;
 
@@ -13,7 +15,7 @@ public class AddOperation extends BinaryOperation implements Serializable {
 		return left + right;
 	}
 
-	protected AddOperation(double left, double right, long nodeId, Client receiver) {
+	public AddOperation(double left, double right, long nodeId, RoutingWorker receiver) {
 		super(left, right, nodeId, receiver);
 	}
 }

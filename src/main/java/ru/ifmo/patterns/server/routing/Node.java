@@ -1,17 +1,20 @@
-package ru.ifmo.patterns.client;
+package ru.ifmo.patterns.server.routing;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.common.primitives.Longs;
+import ru.ifmo.patterns.server.calc.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
 * @author Dmitry Golovchenko
 */
-class Node {
-	private static long idCounter = 0;
+public class Node {
+	private static AtomicLong idCounter = new AtomicLong();
 
 	public final long id;
 	public final Class<? extends BinaryOperation> operationType;
@@ -24,7 +27,7 @@ class Node {
 		this.operationType = null;
 		this.left = null;
 		this.right = null;
-		id = idCounter++;
+		id = idCounter.getAndIncrement();
 	}
 
 	public Node(Class<? extends BinaryOperation> operationType, Node left, Node right) {
@@ -32,7 +35,7 @@ class Node {
 		this.operationType = operationType;
 		this.left = left;
 		this.right = right;
-		id = idCounter++;
+		id = idCounter.getAndIncrement();
 	}
 
 	public boolean canBeCalculated() {
@@ -41,7 +44,7 @@ class Node {
 				&& right != null && right.value != null;
 	}
 
-	public BinaryOperation toBinaryOperation(Client receiver) {
+	public BinaryOperation toBinaryOperation(RoutingWorkerImpl receiver) {
 		if (operationType == AddOperation.class) {
 			return new AddOperation(left.value, right.value, id, receiver);
 		}
@@ -68,6 +71,13 @@ class Node {
 	@Override
 	public int hashCode() {
 		return Longs.hashCode(id);
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+				.add("id", id)
+				.toString();
 	}
 
 	public static List<Node> parseExpression(String expression) throws NumberFormatException {

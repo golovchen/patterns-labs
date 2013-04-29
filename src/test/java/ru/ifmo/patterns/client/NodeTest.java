@@ -1,7 +1,7 @@
 package ru.ifmo.patterns.client;
 
-import org.junit.Assert;
 import org.junit.Test;
+import ru.ifmo.patterns.server.routing.Node;
 
 import java.util.List;
 

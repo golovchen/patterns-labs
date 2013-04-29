@@ -1,4 +1,8 @@
-package ru.ifmo.patterns.server;
+package ru.ifmo.patterns.server.calc;
+
+import ru.ifmo.patterns.server.MessageQueue;
+import ru.ifmo.patterns.server.Worker;
+import ru.ifmo.patterns.server.WorkerPool;
 
 /**
  * @author Dmitry Golovchenko

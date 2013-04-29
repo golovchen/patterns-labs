@@ -37,6 +37,25 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>rmic-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <executions>
+                    <execution>
+                        <id>rmic-process-classes</id>
+                        <goals>
+                            <goal>rmic</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>ru.ifmo.patterns.server.routing.RoutingWorkerImpl</include>
+                            </includes>
+                            <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

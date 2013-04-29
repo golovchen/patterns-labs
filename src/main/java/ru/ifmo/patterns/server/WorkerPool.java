@@ -1,5 +1,7 @@
 package ru.ifmo.patterns.server;
 
+import java.rmi.RemoteException;
+
 /**
  * @author Dmitry Golovchenko
  */
@@ -7,7 +9,7 @@ public class WorkerPool {
 	private final MessageQueue<?> queue;
 	private final Thread[] threads;
 
-	public <T> WorkerPool(MessageQueue<T> queue, WorkerFactory<T> factory, int workersCount) {
+	public <T> WorkerPool(MessageQueue<T> queue, WorkerFactory<T> factory, int workersCount) throws RemoteException {
 		this.queue = queue;
         this.threads = new Thread[workersCount];
         for (int i = 0; i < workersCount; i++) {

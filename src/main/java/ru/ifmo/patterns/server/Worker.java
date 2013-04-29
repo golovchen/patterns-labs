@@ -16,22 +16,22 @@ public abstract class Worker<T> implements Runnable {
 
 	@Override
 	public void run() {
-		try {
-			while (!Thread.currentThread().isInterrupted()) {
-				T task = messageQueue.take();
-				try {
-					handle(task);
-				} catch (Exception e) {
-					System.err.println("Exception during handling task " + task + ": " + e.getMessage());
-					e.printStackTrace();
-				}
+		while (!Thread.currentThread().isInterrupted()) {
+			T task = null;
+			try {
+				task = messageQueue.take();
+				handle(task);
+			} catch (RemoteException e) {
+				workerPool.queueAccessException(e);
+				return;
+			} catch (InterruptedException e) {
+				return;
+			} catch (Exception e) {
+				System.err.println("Exception during handling task " + task + ": " + e.getMessage());
+				e.printStackTrace();
 			}
-		} catch (RemoteException e) {
-			workerPool.queueAccessException(e);
-		} catch (InterruptedException e) {
-			//Everything is OK
 		}
 	}
 
-	protected abstract void handle(T message) throws InterruptedException;
+	protected abstract void handle(T message) throws InterruptedException, RemoteException;
 }
